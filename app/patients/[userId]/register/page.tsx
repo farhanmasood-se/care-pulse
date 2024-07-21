@@ -1,8 +1,10 @@
-import PatientForm from '@/components/forms/PatientForm';
-import Link from 'next/link';
+import RegisterForm from '@/components/forms/RegisterForm';
+import { getUser } from '@/lib/actions/patient.actions';
 import Image from 'next/image';
 
-export default function Home() {
+const Register = async ({ params: { userId } }: SearchParamProps) => {
+  const user = await getUser(userId);
+
   return (
     <div className="flex h-screen max-h-screen">
       <section className="remove-scrollbar container">
@@ -15,16 +17,9 @@ export default function Home() {
             className="mb-12 h-10 w-fit"
           />
 
-          <PatientForm />
+          <RegisterForm user={user} />
 
-          <div className="text-14-regular mt-20 flex justify-between">
-            <p className="justify-items-end text-dark-600 xl:text-left">
-              © 2024 CarePluse
-            </p>
-            <Link href="/?admin=true" className="text-green-500">
-              Admin
-            </Link>
-          </div>
+          <p className="copyright py-12">© 2024 CarePluse</p>
         </div>
       </section>
 
@@ -37,4 +32,6 @@ export default function Home() {
       />
     </div>
   );
-}
+};
+
+export default Register;
