@@ -1,58 +1,43 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { getPatient } from '@/lib/actions/patient.actions';
+
 import AppointmentForm from '@/components/forms/AppointmentForm';
+import { getPatient } from '@/lib/actions/patient.actions';
 
-interface Patient {
-  $id: string;
-}
+import * as Sentry from '@sentry/nextjs';
 
-const Appointment = ({
-  params: { userId },
-}: {
-  params: { userId: string };
-}) => {
-  const [patient, setPatient] = useState<Patient | null>(null);
+const Appointment = async ({ params: { userId } }: SearchParamProps) => {
+  const patient = await getPatient(userId);
 
-  useEffect(() => {
-    const fetchPatient = async () => {
-      const patientData = await getPatient(userId);
-      setPatient(patientData);
-    };
-
-    fetchPatient();
-  }, [userId]);
+  Sentry.metrics.set('user_view_new-appointment', patient?.name);
 
   return (
     <div className="flex h-screen max-h-screen">
-      <section className="remove-scrollbar container">
-        <div className="sub-container max-w-[860px] flex-1 flex-col py-10">
+      <section className="remove-scrollbar container my-auto">
+        <div className="sub-container max-w-[860px] flex-1 justify-between">
           <Image
             src="/assets/icons/logo-full.svg"
             height={1000}
             width={1000}
-            alt="patient"
+            alt="logo"
             className="mb-12 h-10 w-fit"
           />
 
           <AppointmentForm
-            type="create"
+            patientId={patient?.$id}
             userId={userId}
-            patientId={patient?.$id!}
+            type="create"
           />
 
-          <p className="copyright mt-10 my-12">© 2024 CatePulse</p>
+          <p className="copyright mt-10 py-12">© 2024 CarePluse</p>
         </div>
       </section>
 
       <Image
         src="/assets/images/appointment-img.png"
-        height={1000}
-        width={1000}
-        alt="patient"
-        className="side-img max-w-[390px]"
+        height={1500}
+        width={1500}
+        alt="appointment"
+        className="side-img max-w-[390px] bg-bottom"
       />
     </div>
   );
