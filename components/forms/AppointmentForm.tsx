@@ -7,12 +7,12 @@ import CustomFormField from '../CustomFormField';
 import { Form } from '@/components/ui/form';
 import SubmitButton from '../SubmitButton';
 import { useState } from 'react';
-import {
-  getAppointmentSchema,
-  ScheduleAppointmentSchema,
-} from '@/lib/validation';
+import { getAppointmentSchema } from '@/lib/validation';
 import { useRouter } from 'next/navigation';
-import { createAppointment } from '@/lib/actions/appointments.actions';
+import {
+  createAppointment,
+  updateAppointment,
+} from '@/lib/actions/appointments.actions';
 import { FormFieldType } from './PatientForm';
 import { Doctors } from '@/constants';
 import { SelectItem } from '../ui/select';
@@ -84,6 +84,25 @@ const AppointmentForm = ({
           router.push(
             `/patients/${userId}/new-appointment/success?appointmentId=${appointment.$id}`,
           );
+        }
+      } else {
+        const appointmentToUpdate = {
+          userId,
+          appointmentId: appointment?.$id!,
+          appointment: {
+            primaryPhysician: values?.primaryPhysician,
+            schedule: new Date(values?.schedule),
+            status: status as Status,
+            cancellationReason: values?.cancellationReason,
+          },
+          type,
+        };
+
+        const updatedAppointment = await updateAppointment(appointmentToUpdate);
+
+        if (updatedAppointment) {
+          setOpen && setOpen(false);
+          form.reset();
         }
       }
     } catch (error) {
